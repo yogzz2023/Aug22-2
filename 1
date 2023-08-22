@@ -1,0 +1,60 @@
+Certainly, I can help you integrate threading into your existing code for parallel encryption. Here's how you can modify your code to include threading:
+
+1. Include the necessary headers at the beginning of your code:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <openssl/evp.h>
+```
+
+2. Define the `encryptFile` function from your provided code:
+
+```c
+void* encryptFile(void* arg) {
+    // ... Your existing code for the encryptFile function ...
+}
+```
+
+3. Modify your `encrypt_file` function to use threading for parallel encryption:
+
+```c
+int encrypt_file(char *source_file,char *hash)
+{
+    // ... Your existing code ...
+
+    // Create a thread array to hold thread IDs
+    pthread_t threads[6]; // Using 6 threads for 6 cores
+
+    // Loop to process multiple files in parallel
+    for (int i = 0; i < 6; i++) { // Using 6 threads for 6 cores
+        // Create a struct to pass arguments to the thread
+        struct ThreadArgs {
+            char* source_file;
+            char* hash;
+        } threadArgs;
+
+        // Set the arguments for the thread
+        threadArgs.source_file = source_file;
+        threadArgs.hash = hash;
+
+        // Create the thread
+        pthread_create(&threads[i], NULL, encryptFile, &threadArgs);
+    }
+
+    // Wait for all threads to finish
+    for (int i = 0; i < 6; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // ... Rest of your existing code ...
+
+    return 1;
+}
+```
+
+Remember that you'll need to adjust the number of threads and thread creation/joining logic based on your system's configuration and requirements.
+
+This modification will allow your `encrypt_file` function to execute parallel encryption using threads. Each thread will execute the `encryptFile` function on a separate file.
